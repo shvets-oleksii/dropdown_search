@@ -780,6 +780,9 @@ class DropdownSearchPopupState<T> extends State<DropdownSearchPopup<T>> {
   ///close popup
   void closePopup() => Navigator.pop(context);
 
+  void refreshItems() =>
+      _manageLoadItems(searchBoxController.text, isFirstLoad: true);
+
   void selectAllItems() => selectItems(_currentShowedItems);
 
   void deselectAllItems() => deselectItems(_selectedItems);
