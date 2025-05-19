@@ -687,6 +687,9 @@ class DropdownSearchPopupState<T> extends State<DropdownSearchPopup<T>> {
     _selectedItemsNotifier.value = List.from(_selectedItems);
   }
 
+  void refreshItems() =>
+      _manageLoadItems(searchBoxController.text, isFirstLoad: true);
+
   void selectAllItems() => selectItems(_currentShowedItems);
 
   void deselectAllItems() => deselectItems(_selectedItems);
