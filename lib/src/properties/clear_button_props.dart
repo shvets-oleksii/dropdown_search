@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class ClearButtonProps extends IconButtonProps {
   const ClearButtonProps({
-    super.icon = const Icon(Icons.clear, size: 24),
+    super.icon,
     super.isVisible = false,
     super.iconSize = 24.0,
     super.visualDensity,
@@ -25,5 +25,6 @@ class ClearButtonProps extends IconButtonProps {
     super.style,
     super.isSelected,
     super.selectedIcon,
+    super.onHover,
   });
 }

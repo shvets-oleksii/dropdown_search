@@ -1,3 +1,104 @@
+## [7.0.0] - 2026.04.03
+* #### New Feature:
+  * Add adaptive platform Ui feature: `Material`, `Cupertino` and `Adaptive`
+  * Add `autocomplete` new popup mode
+  * add `transitionBuilder`, `transitionDuration`, `reverseTransitionDuration` to `menuProps`
+
+    ```dart
+      transitionDuration: Duration(milliseconds: 500),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).animate(animation),
+          child: child,
+        );
+      }
+    ```
+    
+  * add new property `animationBuilder` to `DropdownButtonProps`, examples of uses
+   ```dart
+      /* Example 1: animation with only one icon ("iconClosed") like rotation */
+      animationBuilder: (child, isOpen) {
+        return AnimatedRotation(
+          turns: isOpen ? .5 : 0,
+          duration: Duration(milliseconds: 400),
+          child: child,
+        );
+      }
+    ```
+
+    ```dart
+      /* Example 2 : animation with two icons like switch */
+      dropdownButtonProps: DropdownButtonProps(
+        iconClosed: Icon(Icons.arrow_drop_down),
+        iconOpened: Icon(Icons.arrow_drop_up),
+        animationBuilder: (child, isOpen) {
+          return AnimatedSwitcher(
+            switchOutCurve: Curves.easeIn,
+            switchInCurve: Curves.easeIn,
+            duration: Duration(milliseconds: 400),
+            child: child,
+          );
+        },
+      )
+    ```
+  * add new property `layoutDelegate` to `MenuProps` and `CupertinoMenuProps`, you can extend
+    [`SingleChildLayoutDelegate`](https://api.flutter.dev/flutter/rendering/SingleChildLayoutDelegate-class.html)
+    to create your own positioning strategy
+     
+    example of use
+    ```dart
+      layoutDelegate: (context, padding, position) => _PopupMenuRouteLayout(context, position)
+    
+      class _PopupMenuRouteLayout extends SingleChildLayoutDelegate {
+        final RelativeRect position;
+        final BuildContext context;
+    
+        const _PopupMenuRouteLayout(this.context, this.position);
+    
+      @override
+      BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
+        // pick any properties from the context to calculate proper constraints
+        final mediaQuery = MediaQuery.of(context);
+        final keyBoardHeight = mediaQuery.viewInsets.bottom;
+        final safeArea = mediaQuery.padding;
+    
+        return BoxConstraints(/* calculate new constraints based on your needs */);
+      }
+    
+        @override
+        Offset getPositionForChild(Size size, Size childSize) {
+          // The position where the child should be placed.
+        }
+    
+        @override
+        bool shouldRelayout(covariant SingleChildLayoutDelegate oldDelegate) => false;
+      }
+    ``` 
+  * add `SuggestionsProps` to `popupProps`
+  * add `builder` property for `SuggestionsProps` to override the hole suggestion widget
+  * add properties to `scrollView` and `wrap` widget for selected items in multiSelection mode
+  * `Chips` are fully customizable in multiSelection and suggestions
+  * replace `padding` in `searchFieldProps` with `containerBuilder`
+  * add `onDisplayed` callback to `popupProps`
+  * add `errorBuilder` for `InfiniteScrollProps`
+  * add possibility to reload item using `myGlobalKey.currentState?.reloadItems(String filter)` or `myGlobalKey.currentState?.loadMoreItems(String filter, int skip)`
+  * add `textProps` to have the ability to pass default text props through the context to `selectedItem` 
+  * add new property for `TextFieldProps`
+  * add the ability to listen to focus changes using `onFocusChange`
+  * add new callbacks `onBeforeClear` and `onClear` to handle dropdown clear button action
+  
+* #### Breaking changes
+  * change `onChanged` to `onSelected`
+  * `PopupPropsMultiSelection` changed to `MultiSelectionPopupProps` 
+  * `suggestedItemsProps` is placed inside `SuggestionsProps`
+  * `Semantics` is removed from searchBox, to add it use `containerBuilder` like this you have full access to Semantic properties.
+
+* #### Fix bugs:
+  * `BottomSheet` background color [726](https://github.com/salim-lachdhaf/searchable_dropdown/issues/726)
+
 ## [6.0.1] - 2024.09.21
 * #### New Feature:
   * add `Semantics` to searchBox to support voiceOver/TalkBack ...

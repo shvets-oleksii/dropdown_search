@@ -1,15 +1,18 @@
+import 'dart:math';
+
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:example/main.dart';
+import 'package:example/user_model.dart';
 import 'package:flutter/material.dart';
 
-import 'main.dart';
-import 'user_model.dart';
-
-class DialogExamplesPage extends StatefulWidget {
+class MaterialDialogExamplesPage extends StatefulWidget {
   @override
-  State<DialogExamplesPage> createState() => _DialogExamplesPageState();
+  State<MaterialDialogExamplesPage> createState() =>
+      _MaterialDialogExamplesPageState();
 }
 
-class _DialogExamplesPageState extends State<DialogExamplesPage> {
+class _MaterialDialogExamplesPageState
+    extends State<MaterialDialogExamplesPage> {
   final _formKey = GlobalKey<FormState>();
   final _dropDownCustomBGKey = GlobalKey<DropdownSearchState<String>>();
   final _userEditTextController = TextEditingController(text: 'Mrs');
@@ -91,7 +94,7 @@ class _DialogExamplesPageState extends State<DialogExamplesPage> {
                           filled: true,
                         ),
                       ),
-                      popupProps: PopupPropsMultiSelection.dialog(
+                      popupProps: PopupProps.dialog(
                         disabledItemFn: (int i) => i <= 3,
                       ),
                     ),
@@ -109,15 +112,16 @@ class _DialogExamplesPageState extends State<DialogExamplesPage> {
                     child: DropdownSearch<UserModel>(
                       items: (filter, t) => getData(filter),
                       compareFn: (i, s) => i.isEqual(s),
-                      popupProps: PopupPropsMultiSelection.dialog(
+                      popupProps: PopupProps.dialog(
+                        disabledItemFn: (item) => item.name.contains('Am'),
                         showSelectedItems: true,
                         showSearchBox: true,
                         itemBuilder: userModelPopupItem,
-                        suggestedItemProps: SuggestedItemProps(
-                          showSuggestedItems: true,
-                          suggestedItems: (us) {
+                        suggestionsProps: SuggestionsProps(
+                          showSuggestions: true,
+                          items: (us) {
                             return us
-                                .where((e) => e.name.contains("Mrs"))
+                                .where((e) => e.name.contains("e"))
                                 .toList();
                           },
                         ),
@@ -126,43 +130,22 @@ class _DialogExamplesPageState extends State<DialogExamplesPage> {
                   ),
                   Padding(padding: EdgeInsets.all(4)),
                   Expanded(
-                    child: DropdownSearch<UserModel>.multiSelection(
-                      items: (filter, s) => getData(filter),
-                      compareFn: (i, s) => i.isEqual(s),
-                      popupProps: PopupPropsMultiSelection.dialog(
-                        showSearchBox: true,
-                        itemBuilder: userModelPopupItem,
-                        suggestedItemProps: SuggestedItemProps(
-                          showSuggestedItems: true,
-                          suggestedItems: (us) {
-                            return us
-                                .where((e) => e.name.contains("Mrs"))
-                                .toList();
-                          },
-                          suggestedItemBuilder: (context, item, isSelected) {
-                            return Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 6),
-                              margin: EdgeInsets.only(left: 8),
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey[100]),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    item.name,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.indigo),
-                                  ),
-                                  Padding(padding: EdgeInsets.only(left: 8)),
-                                  isSelected
-                                      ? Icon(Icons.check_box_outlined)
-                                      : SizedBox.shrink(),
-                                ],
-                              ),
-                            );
-                          },
+                    child: Theme(
+                      data: ThemeData(primaryColorLight: Colors.red),
+                      child: DropdownSearch<UserModel>.multiSelection(
+                        items: (filter, s) => getData(filter),
+                        compareFn: (i, s) => i.isEqual(s),
+                        popupProps: MultiSelectionPopupProps.dialog(
+                          showSearchBox: true,
+                          itemBuilder: userModelPopupItem,
+                          suggestionsProps: SuggestionsProps(
+                            showSuggestions: true,
+                            items: (us) {
+                              return us
+                                  .where((e) => e.name.contains("Mrs"))
+                                  .toList();
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -185,7 +168,7 @@ class _DialogExamplesPageState extends State<DialogExamplesPage> {
                     child: DropdownSearch<String>.multiSelection(
                       key: _dropDownCustomBGKey,
                       items: (f, cs) => List.generate(30, (index) => "$index"),
-                      popupProps: PopupPropsMultiSelection.dialog(
+                      popupProps: MultiSelectionPopupProps.dialog(
                         showSearchBox: true,
                         containerBuilder: (ctx, popupWidget) {
                           return Column(
@@ -250,7 +233,7 @@ class _DialogExamplesPageState extends State<DialogExamplesPage> {
                       items: (filter, t) => getData(filter),
                       suffixProps: DropdownSuffixProps(
                           clearButtonProps: ClearButtonProps(isVisible: true)),
-                      popupProps: PopupPropsMultiSelection.dialog(
+                      popupProps: MultiSelectionPopupProps.dialog(
                         showSelectedItems: true,
                         itemBuilder: userModelPopupItem,
                         showSearchBox: true,
@@ -268,6 +251,7 @@ class _DialogExamplesPageState extends State<DialogExamplesPage> {
                           item.id == selectedItem.id,
                       decoratorProps: DropDownDecoratorProps(
                         decoration: InputDecoration(
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
                           labelText: 'Users *',
                           filled: true,
                           fillColor:
@@ -281,7 +265,7 @@ class _DialogExamplesPageState extends State<DialogExamplesPage> {
                   Expanded(
                     child: DropdownSearch<UserModel>(
                       items: (filter, t) => getData(filter),
-                      popupProps: PopupPropsMultiSelection.dialog(
+                      popupProps: PopupProps.dialog(
                         showSelectedItems: true,
                         itemBuilder: userModelPopupItem,
                         showSearchBox: true,
@@ -381,7 +365,7 @@ class _DropdownWithGlobalCheckBoxState
   final _infiniteScrollDropDownKey = GlobalKey<DropdownSearchState<int>>();
   final ValueNotifier<bool?> longListCheckBoxValueNotifier =
       ValueNotifier(false);
-  final longList = List.generate(110, (i) => i + 1);
+  final longList = List.generate(500, (i) => i + 1);
 
   bool? _getCheckBoxState() {
     var selectedItem =
@@ -393,21 +377,26 @@ class _DropdownWithGlobalCheckBoxState
   }
 
   ///simulate an API call
-  Future<List<int>> _getData(String filter, LoadProps? loadProps) {
-    return Future.delayed(Duration(seconds: 1), () {
-      var list = filter.isEmpty
-          ? longList
-          : longList.where((l) => l.toString().contains(filter));
+  Future<List<int>> _getData(String filter, LoadProps loadProps) async {
+    await Future.delayed(Duration(seconds: 5));
+    //simulate random error
+    final errorIndex = Random().nextInt(100);
+    if (errorIndex <= loadProps.skip) {
+      throw Exception('Sorry, An error occurred !');
+    }
 
-      return list.skip(loadProps!.skip).take(loadProps.take).toList();
-    });
+    var list = filter.isEmpty
+        ? longList
+        : longList.where((l) => l.toString().contains(filter));
+
+    return list.skip(loadProps.skip).take(loadProps.take).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return DropdownSearch<int>.multiSelection(
       key: _infiniteScrollDropDownKey,
-      items: (f, ic) => _getData(f, ic),
+      items: (f, ic) => _getData(f, ic!),
       decoratorProps: DropDownDecoratorProps(
         decoration: InputDecoration(
           border: OutlineInputBorder(),
@@ -415,15 +404,32 @@ class _DropdownWithGlobalCheckBoxState
           contentPadding: EdgeInsets.fromLTRB(12, 12, 0, 0),
         ),
       ),
-      popupProps: PopupPropsMultiSelection.dialog(
+      popupProps: MultiSelectionPopupProps.dialog(
         onItemAdded: (l, s) =>
             longListCheckBoxValueNotifier.value = _getCheckBoxState(),
         onItemRemoved: (l, s) =>
             longListCheckBoxValueNotifier.value = _getCheckBoxState(),
         onItemsLoaded: (value) =>
             longListCheckBoxValueNotifier.value = _getCheckBoxState(),
-        infiniteScrollProps:
-            InfiniteScrollProps(loadProps: LoadProps(skip: 0, take: 10)),
+        infiniteScrollProps: InfiniteScrollProps(
+          loadProps: LoadProps(skip: 0, take: 10),
+          errorBuilder: (context, searchEntry, exception, loadProps) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('$exception'),
+                TextButton.icon(
+                  onPressed: () {
+                    _infiniteScrollDropDownKey.currentState?.getPopupState
+                        ?.loadMoreItems(searchEntry, loadProps.skip);
+                  },
+                  icon: Icon(Icons.sync),
+                  label: Text('reload'),
+                )
+              ],
+            );
+          },
+        ),
         showSearchBox: true,
         containerBuilder: (ctx, popupWidget) {
           return Container(
